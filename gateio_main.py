@@ -21,7 +21,7 @@ if __name__ == '__main__':
     spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
     # returns df with combinations of all usdt and remove unwanted rows from df
     arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
-    arb_df.to_json('arb_df_bak.json', orient='records')
+    arb_df.to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
     while True:
         print("\033[H\033[J")  # clear terminal
         print(arb_df)
