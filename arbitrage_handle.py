@@ -19,7 +19,7 @@ def create_quote_df(spot_quote_market):
     spot_ETH_ticker = []
     spot_USDC_last = []
     spot_USDC_ticker = []
-    for ticker in tqdm(enumerate(spot_quote_market), desc="Processing tickers", total=len(spot_quote_market)):
+    for ticker in tqdm(enumerate(spot_quote_market), desc="quoting tickers", total=len(spot_quote_market)):
         try:
             spot_ticker_info = spot_market.spot_ticker_information(ticker[1]['id'])
             if ticker[1]['quote'] == 'USDT':
@@ -57,7 +57,7 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
     arb_df_eth_last = []
     arb_df_usdc_last = []
 
-    for market in tqdm(enumerate(spot_USDT_df), desc="Processing tickers", total=len(spot_USDT_df)):
+    for market in tqdm(enumerate(spot_USDT_df), desc="getting market price", total=len(spot_USDT_df)):
         try:
             arb_df_usdt_last = market[1]['last']
             arb_df_ticker = market[1]['ticker']
@@ -92,7 +92,7 @@ def remove_unwanted_from_df(arb_df):
     global btc_price_diff_pct, eth_price_diff_pct, usdc_price_diff_pct
     filtered_arb_df = arb_df[~((arb_df['btc_last'] == 0) & (arb_df['eth_last'] == 0) & (arb_df['usdc_last'] == 0))]
     rows_to_remove = []
-    for index, market in filtered_arb_df.iterrows():
+    for index, market in tqdm(filtered_arb_df.iterrows(), total=len(filtered_arb_df), desc='df updation'):
         btc_last_price = market['btc_last']
         eth_last_price = market['eth_last']
         usdc_last_price = market['usdc_last']
@@ -119,4 +119,4 @@ def remove_unwanted_from_df(arb_df):
             filtered_arb_df.loc[index, 'usdc_pct'] = usdc_price_diff_pct
 
     return filtered_arb_df.drop(rows_to_remove)
-##
+

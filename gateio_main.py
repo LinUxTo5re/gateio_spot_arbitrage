@@ -1,4 +1,6 @@
 import asyncio
+import time
+
 import requests
 import pandas as pd
 from shared import *
@@ -19,4 +21,11 @@ if __name__ == '__main__':
     spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
     # returns df with combinations of all usdt and remove unwanted rows from df
     arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
-##
+    arb_df.to_json('arb_df_bak.json', orient='records')
+    while True:
+        print("\033[H\033[J")  # clear terminal
+        print(arb_df)
+        print("Live Market Prices:")
+        print(live_market.live_market_price(arb_df))
+        time.sleep(5)
+

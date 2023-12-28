@@ -45,4 +45,3 @@ def live_spot_data(ticker):
     live_spot = requests.request('GET', host + prefix + spot_candlestick_url, params=query_param,
                                  headers=headers).json()
     return live_spot[0][2]
-##
