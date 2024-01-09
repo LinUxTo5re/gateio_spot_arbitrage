@@ -1,0 +1,32 @@
+In asynchronous programming, using the `await` keyword does not necessarily mean waiting for the current
+ function's execution in a blocking manner. When an `await` is encountered in an async function, 
+it allows the event loop to switch to other tasks or coroutines that are ready to execute
+ without halting the entire program's flow. This is the essence of non-blocking behavior in async programming.
+
+Here's a breakdown of how `await` operates in asynchronous code:
+
+1. **Async Function Execution**: When an async function is invoked, it returns a coroutine object,
+ indicating that it can be suspended and resumed.
+
+2. **Await Expression**: When encountering an `await` expression within an async function, 
+it doesn't necessarily mean that the current function execution halts completely. Instead, 
+it allows the event loop to continue executing other tasks or coroutines that are ready to run.
+
+3. **Waiting for Asynchronous Operation**: The `await` expression does pause the execution of the current 
+coroutine until the awaited asynchronous operation completes. During this time, 
+the event loop can schedule and execute other coroutines or tasks that are not dependent on the awaited operation.
+
+4. **Non-Blocking Nature**: Asynchronous programming enables concurrency by allowing multiple asynchronous
+ operations to run concurrently within a single thread. While one coroutine awaits 
+an I/O operation (such as network request, file read, etc.), the event loop can switch to 
+executing other coroutines that are ready to continue.
+
+5. **Continuation After Await**: Once the awaited operation is completed, 
+the event loop resumes the suspended coroutine at the point where the `await` expression was encountered, 
+allowing the coroutine to continue its execution.
+
+In summary, using `await` in async programming doesn't block the entire program's execution. 
+It enables non-blocking behavior by allowing the event loop to manage the execution of multiple tasks 
+concurrently, pausing and resuming coroutines as needed based on the completion of awaited asynchronous operations. 
+This concurrency allows for more efficient use of time, especially in scenarios involving I/O-bound
+ operations where waiting for external resources is common.

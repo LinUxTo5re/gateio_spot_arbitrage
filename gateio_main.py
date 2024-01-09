@@ -1,38 +1,59 @@
-import asyncio
 import json
-import time
-import os
-import requests
-import pandas as pd
-from shared import *
 import spot_market
-from tqdm import tqdm
 import arbitrage_handle
 import live_market
+import asyncio
+
+# global variables
+arb_df = ""
+existing_json = new_json = ""
 
 
-# common markets from spot and future
-def common_markets_filtering():
-    pass
+async def arbitrage_json():
+    global arb_df
+    spot_market_list = spot_market.spot_markets_list()
+    spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
+    spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
+    new_arb_df = await arbitrage_handle.create_quote_df(spot_quote_market)
+    new_arb_df.to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
+    await arbitrage_existing_json()
 
 
-if __name__ == '__main__':
-    file_exists = os.path.exists('arb_df_bak.json')
-    if file_exists:
-        with open('arb_df_bak.json', 'r') as file:
-            arb_df = json.load(file)
-    else:
-        spot_market_list = spot_market.spot_markets_list()
-        spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
-        spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
-        # returns df with combinations of all usdt and remove unwanted rows from df
-        arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
-        arb_df.to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
+async def arbitrage_existing_json():
+    global arb_df
+    with open('arb_df_bak.json', 'r') as file:
+        arb_df = json.load(file)
 
-    while True:
+
+async def main():
+    global existing_json, new_json
+    try:
+        try:
+            new_json = asyncio.create_task(arbitrage_json())
+        except Exception as e:
+            print("\n", e)
+        existing_json = asyncio.create_task(arbitrage_existing_json())
+    except Exception as ex:
+        print("\n", ex)
+
+    await new_json
+    await existing_json
+
+
+async def while_loop():
+    print()
+    global arb_df
+    while True and arb_df is not None and not arb_df == "":
         print("\033[H\033[J")  # clear terminal
         print(arb_df)
         print("Live Market Prices:")
         print(live_market.live_market_price(arb_df))
-        time.sleep(5)
+        await asyncio.sleep(5)
 
+
+async def run_program():
+    await asyncio.gather(main(), while_loop())
+
+
+if __name__ == '__main__':
+    asyncio.run(run_program())

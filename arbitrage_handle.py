@@ -6,7 +6,7 @@ btc_price_diff_pct = eth_price_diff_pct = usdc_price_diff_pct = 0
 
 
 # create quote df for each quote asset
-def create_quote_df(spot_quote_market):
+async def create_quote_df(spot_quote_market):
     spot_USDT_df = pd.DataFrame()
     spot_BTC_df = pd.DataFrame()
     spot_ETH_df = pd.DataFrame()
@@ -45,11 +45,11 @@ def create_quote_df(spot_quote_market):
     spot_ETH_df['last'] = spot_ETH_last
     spot_USDC_df['ticker'] = spot_USDC_ticker
     spot_USDC_df['last'] = spot_USDC_last
-    return create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df)
+    return await create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df)
 
 
 # create combined df of quote asset with last price
-def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
+async def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
     arb_df = pd.DataFrame()
     arb_df_ticker = []
     arb_df_usdt_last = []
@@ -57,7 +57,7 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
     arb_df_eth_last = []
     arb_df_usdc_last = []
 
-    for market in tqdm(enumerate(spot_USDT_df), desc="getting market price", total=len(spot_USDT_df)):
+    for market in tqdm(spot_USDT_df.iterrows(), desc="getting market price", total=len(spot_USDT_df)):
         try:
             arb_df_usdt_last = market[1]['last']
             arb_df_ticker = market[1]['ticker']
@@ -84,11 +84,11 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
     arb_df['btc_last'] = arb_df_btc_last
     arb_df['eth_last'] = arb_df_eth_last
     arb_df['usdc_last'] = arb_df_usdc_last
-    return remove_unwanted_from_df(arb_df)
+    return await remove_unwanted_from_df(arb_df)
 
 
 # remove tickers with price diff less than 5% or last price is 0
-def remove_unwanted_from_df(arb_df):
+async def remove_unwanted_from_df(arb_df):
     global btc_price_diff_pct, eth_price_diff_pct, usdc_price_diff_pct
     filtered_arb_df = arb_df[~((arb_df['btc_last'] == 0) & (arb_df['eth_last'] == 0) & (arb_df['usdc_last'] == 0))]
     rows_to_remove = []

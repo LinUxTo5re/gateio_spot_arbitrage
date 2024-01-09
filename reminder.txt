@@ -1,2 +1,2 @@
-handle if file_exists in gateio_main.py and make sure that u've added asych to
+handle if file_exists in gateio_main.py and make sure that u've added async to
 continue to update of json data if exists
