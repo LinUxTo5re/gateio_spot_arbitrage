@@ -1,3 +1,5 @@
+import time
+
 from shared import *
 import requests
 
@@ -15,17 +17,20 @@ param: quote - USDT/BTC/ETH/USDC/TRY
 
 def spot_quote_tradable_markets(spot_market_list):
     return [quote_market for quote_market in spot_market_list if
-            quote_market.get('quote') in ('USDT', 'BTC', 'ETH', 'TRY') and quote_market['trade_status'] == 'tradable']
+            quote_market.get('quote') in ('USDT', 'BTC', 'ETH', 'USDC') and quote_market['trade_status'] == 'tradable']
 
 
 # spot ticker information to get last price of ticker
 def spot_ticker_information(ticker):
     query_param = {"currency_pair": ticker}
-    spot_ticker_info = requests.request('GET', host + prefix + spot_ticker_info_url, headers=headers,
-                                        params=query_param).json()
-    if float(spot_ticker_info[0]['last']) > 10.00:  # if price is more than $10 then ignore it
+    try:
+        spot_ticker_info = requests.request('GET', host + prefix + spot_ticker_info_url, headers=headers,
+                                            params=query_param).json()
+        if float(spot_ticker_info[0]['last']) > 10.00:  # if price is more than $10 then ignore it
+            return False, False
+        return float(spot_ticker_info[0]['last'])
+    except Exception as e:
         return False, False
-    return float(spot_ticker_info[0]['last'])
 
 
 # spot ticker order book to get low asks and high bids
@@ -38,10 +43,14 @@ def spot_order_book(ticker):
 
 # live spot ticker data(10s) to be used with live future data (close price as last_price)
 def live_spot_data(ticker):
-    query_param = {
-        'currency_pair': ticker,
-        'interval': '10s',
-        'limit': 1}
-    live_spot = requests.request('GET', host + prefix + spot_candlestick_url, params=query_param,
-                                 headers=headers).json()
-    return live_spot[0][2]
+    try:
+        query_param = {
+            'currency_pair': ticker,
+            'interval': '10s',
+            'limit': 1}
+        live_spot = requests.request('GET', host + prefix + spot_candlestick_url, params=query_param,
+                                     headers=headers).json()
+        return live_spot[0][2]
+    except Exception as e:
+        time.sleep(5)
+        return spot_ticker_information(ticker)

@@ -1,4 +1,6 @@
 import pandas as pd
+
+import live_market
 import spot_market
 from tqdm import tqdm
 
@@ -22,21 +24,26 @@ async def create_quote_df(spot_quote_market):
     for ticker in tqdm(enumerate(spot_quote_market), desc="quoting tickers", total=len(spot_quote_market)):
         try:
             spot_ticker_info = spot_market.spot_ticker_information(ticker[1]['id'])
-            if ticker[1]['quote'] == 'USDT':
-                spot_USDT_ticker.append(ticker[1]['id'])
-                spot_USDT_last.append(spot_ticker_info)
-            elif ticker[1]['quote'] == 'BTC':
-                spot_BTC_ticker.append(ticker[1]['id'])
-                spot_BTC_last.append(spot_ticker_info)
-            elif ticker[1]['quote'] == 'ETH':
-                spot_ETH_ticker.append(ticker[1]['id'])
-                spot_ETH_last.append(spot_ticker_info)
+            if not isinstance(spot_ticker_info, tuple):
+                if ticker[1]['quote'] == 'USDT':
+                    spot_USDT_ticker.append(ticker[1]['base'])
+                    spot_USDT_last.append(spot_ticker_info)
+                elif ticker[1]['quote'] == 'BTC':
+                    spot_BTC_ticker.append(ticker[1]['base'])
+                    spot_BTC_last.append(spot_ticker_info)
+                elif ticker[1]['quote'] == 'ETH':
+                    spot_ETH_ticker.append(ticker[1]['base'])
+                    spot_ETH_last.append(spot_ticker_info)
+                elif ticker[1]['quote'] == 'USDC':
+                    spot_USDC_ticker.append(ticker[1]['base'])
+                    spot_USDC_last.append(spot_ticker_info)
+                else:
+                    pass
             else:
-                spot_USDC_ticker.append(ticker[1]['id'])
-                spot_USDC_last.append(spot_ticker_info)
+                pass
         except Exception as e:
             print(f'\n{e}')
-
+    # base == ticker
     spot_USDT_df['ticker'] = spot_USDT_ticker
     spot_USDT_df['last'] = spot_USDT_last
     spot_BTC_df['ticker'] = spot_BTC_ticker
@@ -56,24 +63,24 @@ async def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_d
     arb_df_btc_last = []
     arb_df_eth_last = []
     arb_df_usdc_last = []
-
+    btc_usdt_price, eth_usdt_price, usdc_usdt_price = live_market.quote_live_market_price()
     for market in tqdm(spot_USDT_df.iterrows(), desc="getting market price", total=len(spot_USDT_df)):
         try:
-            arb_df_usdt_last = market[1]['last']
-            arb_df_ticker = market[1]['ticker']
+            arb_df_usdt_last.append(market[1]['last'])
+            arb_df_ticker.append(market[1]['ticker'])
             if market[1]['ticker'] in spot_BTC_df['ticker'].values:
                 arb_df_btc_last.append(
-                    spot_BTC_df.loc[spot_BTC_df['ticker'] == market[1]['ticker'], 'last_price'].values[0])
+                    spot_BTC_df.loc[spot_BTC_df['ticker'] == market[1]['ticker'], 'last'].values[0] * btc_usdt_price)
             else:
                 arb_df_btc_last.append(0.00)
             if market[1]['ticker'] in spot_ETH_df['ticker'].values:
                 arb_df_eth_last.append(
-                    spot_ETH_df.loc[spot_ETH_df['ticker'] == market[1]['ticker'], 'last_price'].values[0])
+                    spot_ETH_df.loc[spot_ETH_df['ticker'] == market[1]['ticker'], 'last'].values[0] * eth_usdt_price)
             else:
                 arb_df_eth_last.append(0.00)
             if market[1]['ticker'] in spot_USDC_df['ticker'].values:
                 arb_df_usdc_last.append(
-                    spot_USDC_df.loc[spot_USDC_df['ticker'] == market[1]['ticker'], 'last_price'].values[0])
+                    spot_USDC_df.loc[spot_USDC_df['ticker'] == market[1]['ticker'], 'last'].values[0] * usdc_usdt_price)
             else:
                 arb_df_usdc_last.append(0.00)
         except Exception as e:
@@ -84,11 +91,11 @@ async def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_d
     arb_df['btc_last'] = arb_df_btc_last
     arb_df['eth_last'] = arb_df_eth_last
     arb_df['usdc_last'] = arb_df_usdc_last
-    return await remove_unwanted_from_df(arb_df)
+    return remove_unwanted_from_df(arb_df)
 
 
 # remove tickers with price diff less than 5% or last price is 0
-async def remove_unwanted_from_df(arb_df):
+def remove_unwanted_from_df(arb_df):
     global btc_price_diff_pct, eth_price_diff_pct, usdc_price_diff_pct
     filtered_arb_df = arb_df[~((arb_df['btc_last'] == 0) & (arb_df['eth_last'] == 0) & (arb_df['usdc_last'] == 0))]
     rows_to_remove = []
@@ -101,22 +108,17 @@ async def remove_unwanted_from_df(arb_df):
             numerator = abs(btc_last_price - usdt_last_price)
             denominator = btc_last_price if btc_last_price > usdt_last_price else usdt_last_price
             btc_price_diff_pct = (numerator / denominator) * 100
-        elif eth_last_price:
+        if eth_last_price:
             numerator = abs(eth_last_price - usdt_last_price)
             denominator = eth_last_price if eth_last_price > usdt_last_price else usdt_last_price
             eth_price_diff_pct = (numerator / denominator) * 100
-        elif usdc_last_price:
+        if usdc_last_price:
             numerator = abs(usdc_last_price - usdt_last_price)
             denominator = usdc_last_price if usdc_last_price > usdt_last_price else usdt_last_price
             usdc_price_diff_pct = (numerator / denominator) * 100
-        else:
-            pass
-        if btc_price_diff_pct < 5 and eth_price_diff_pct < 5 and usdc_price_diff_pct < 5:
+
+        if btc_price_diff_pct < 0.1 and eth_price_diff_pct < 0.1 and usdc_price_diff_pct < 0.1:
             rows_to_remove.append(index)
-        else:
-            filtered_arb_df.loc[index, 'btc_pct'] = btc_price_diff_pct
-            filtered_arb_df.loc[index, 'eth_pct'] = eth_price_diff_pct
-            filtered_arb_df.loc[index, 'usdc_pct'] = usdc_price_diff_pct
+            btc_price_diff_pct = eth_price_diff_pct = usdc_price_diff_pct = 0.00
 
     return filtered_arb_df.drop(rows_to_remove)
-
