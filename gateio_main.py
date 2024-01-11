@@ -58,6 +58,6 @@ if __name__ == '__main__':
         process_new_json.start()
         # no needed in our case, it blocks the execution of rest of code after .start()
         '''
-        process_while_loop.join()
-        process_new_json.join()
+            process_while_loop.join()
+            process_new_json.join()
         '''
