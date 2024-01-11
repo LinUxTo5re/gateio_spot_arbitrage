@@ -1,5 +1,4 @@
 import time
-
 from shared import *
 import requests
 
@@ -11,7 +10,7 @@ def spot_markets_list():
 
 '''
 spot usdt markets-filtered from spot_market_list
-param: quote - USDT/BTC/ETH/USDC/TRY
+param: quote - USDT/BTC/ETH/USDC
 '''
 
 
