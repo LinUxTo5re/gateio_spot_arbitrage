@@ -10,13 +10,13 @@ def spot_markets_list():
 
 '''
 spot usdt markets-filtered from spot_market_list
-param: quote - USDT/BTC/ETH/USDC
+param: quote - USDT/BTC/ETH
 '''
 
 
 def spot_quote_tradable_markets(spot_market_list):
     return [quote_market for quote_market in spot_market_list if
-            quote_market.get('quote') in ('USDT', 'BTC', 'ETH', 'USDC') and quote_market['trade_status'] == 'tradable']
+            quote_market.get('quote') in ('USDT', 'BTC', 'ETH') and quote_market['trade_status'] == 'tradable']
 
 
 # spot ticker information to get last price of ticker

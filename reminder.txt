@@ -1,2 +1,6 @@
+to do---
+change [:50] and < 0.1 b4 launch
+
+completed-----
 handle if file_exists in gateio_main.py and make sure that u've added async to
 continue to update of json data if exists

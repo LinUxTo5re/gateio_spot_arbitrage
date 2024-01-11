@@ -1,5 +1,6 @@
 import json
 import time
+import extra_operations
 import spot_market
 import arbitrage_handle
 import live_market
@@ -11,14 +12,15 @@ arb_df = ""
 
 def arbitrage_json():
     global arb_df
-    spot_market_list = spot_market.spot_markets_list()
-    spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
-    spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
-    new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market[:50])
-    new_arb_df['ticker'].to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
-    arbitrage_existing_json()
-    # 3600 == 1 hr
-    time.sleep(3600)  # sleeping to avoid more api calls and data get renewed to find fresh data
+    while True:
+        spot_market_list = spot_market.spot_markets_list()
+        spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
+        spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
+        new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market[:10])
+        new_arb_df['ticker'].to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
+        arbitrage_existing_json()
+        # 900 == 15 m
+        time.sleep(900)  # sleeping to avoid more api calls and data get renewed to find fresh data
 
 
 def arbitrage_existing_json():
@@ -31,10 +33,11 @@ def while_loop():
     global arb_df
     arbitrage_existing_json()
     while True and arb_df is not None and not arb_df == "":
-        print("\033[H\033[J")  # clear terminal
+        arbitrage_existing_json()
         print("Live Market Prices:")
         print(live_market.live_market_price(arb_df))
         time.sleep(5)  # take a breath
+        extra_operations.clear_terminal()  # clear terminal
 
 
 if __name__ == '__main__':
