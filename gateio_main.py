@@ -1,10 +1,9 @@
 import json
 import time
-
 import spot_market
 import arbitrage_handle
 import live_market
-import asyncio
+from multiprocessing import Process
 import os
 
 # global variables
@@ -49,4 +48,13 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    process_while_loop = Process(target=while_loop)
+    process_new_json = Process(target=arbitrage_json)
+    process_while_loop.start()
+    process_new_json.start()
+    # no needed for our case, it blocks the execution of rest of code after .start()
+    '''
+    process_while_loop.join()
+    process_new_json.join()
+    '''
+
