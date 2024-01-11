@@ -1,5 +1,4 @@
 import pandas as pd
-
 import live_market
 import spot_market
 from tqdm import tqdm
@@ -8,7 +7,7 @@ btc_price_diff_pct = eth_price_diff_pct = usdc_price_diff_pct = 0
 
 
 # create quote df for each quote asset
-async def create_quote_df(spot_quote_market):
+def create_quote_df(spot_quote_market):
     spot_USDT_df = pd.DataFrame()
     spot_BTC_df = pd.DataFrame()
     spot_ETH_df = pd.DataFrame()
@@ -52,11 +51,11 @@ async def create_quote_df(spot_quote_market):
     spot_ETH_df['last'] = spot_ETH_last
     spot_USDC_df['ticker'] = spot_USDC_ticker
     spot_USDC_df['last'] = spot_USDC_last
-    return await create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df)
+    return create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df)
 
 
 # create combined df of quote asset with last price
-async def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
+def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df, spot_USDC_df):
     arb_df = pd.DataFrame()
     arb_df_ticker = []
     arb_df_usdt_last = []

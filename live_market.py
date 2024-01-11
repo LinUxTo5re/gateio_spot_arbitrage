@@ -1,6 +1,8 @@
+import requests
+
 from spot_market import live_spot_data
 import pandas as pd
-from shared import btc_eth_usdc_list, quote_list
+from shared import btc_eth_usdc_list, quote_list, binance_ticker_price_url
 
 
 def live_market_price(arb_df):
@@ -38,10 +40,19 @@ def live_market_price(arb_df):
 def quote_live_market_price():
     btc_usdt_price = eth_usdt_price = usdc_usdt_price = 0.00
     for ticker in btc_eth_usdc_list:
-        if ticker == 'BTC_USDT':
-            btc_usdt_price = live_spot_data(ticker)
-        if ticker == 'ETH_USDT':
-            eth_usdt_price = live_spot_data(ticker)
-        if ticker == 'USDC_USDT':
-            usdc_usdt_price = live_spot_data(ticker)
+        try:
+            if ticker == 'BTC_USDT':
+                btc_usdt_price = live_spot_data(ticker)
+            if ticker == 'ETH_USDT':
+                eth_usdt_price = live_spot_data(ticker)
+            if ticker == 'USDC_USDT':
+                usdc_usdt_price = live_spot_data(ticker)
+        except Exception as e:
+            if ticker == 'BTC_USDT':
+                btc_usdt_price = requests.get(binance_ticker_price_url+"BTCUSDT").json()['price']
+            if ticker == 'ETH_USDT':
+                eth_usdt_price = requests.get(binance_ticker_price_url+"ETHUSDT").json()['price']
+            if ticker == 'USDC_USDT':
+                usdc_usdt_price = requests.get(binance_ticker_price_url+"USDCUSDT").json()['price']
+
     return float(btc_usdt_price), float(eth_usdt_price), float(usdc_usdt_price)
