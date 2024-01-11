@@ -1,12 +1,13 @@
-import requests
-
+import warnings
 import extra_operations
 from spot_market import live_spot_data
 import pandas as pd
-from shared import btc_eth_list, quote_list, binance_ticker_price_url
+from shared import btc_eth_list, quote_list
 
 
 def live_market_price(arb_df):
+    # Suppress FutureWarnings
+    warnings.simplefilter(action='ignore', category=FutureWarning)
     live_prices_df = pd.DataFrame(
         columns=['ticker', 'usdt_lp', 'eth_lp', 'btc_lp'])
     usdt_live_data = eth_live_data = btc_live_data = ""
@@ -32,7 +33,6 @@ def live_market_price(arb_df):
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
         live_data_tmp.dropna(axis=1, how='all', inplace=True)
         live_prices_df = pd.concat([live_prices_df, live_data_tmp], ignore_index=True)
-
     return live_prices_df
 
 
@@ -42,8 +42,12 @@ def quote_live_market_price():
         try:
             if ticker == 'BTC_USDT':
                 btc_usdt_price = live_spot_data(ticker)
+                if isinstance(btc_usdt_price, tuple):
+                    raise ValueError
             if ticker == 'ETH_USDT':
                 eth_usdt_price = live_spot_data(ticker)
+                if isinstance(eth_usdt_price, tuple):
+                    raise ValueError
         except Exception as e:
             if ticker == 'BTC_USDT':
                 btc_usdt_price = extra_operations.binance_ticker(ticker)

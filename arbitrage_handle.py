@@ -17,7 +17,7 @@ def create_quote_df(spot_quote_market):
     spot_BTC_ticker = []
     spot_ETH_last = []
     spot_ETH_ticker = []
-    for ticker in tqdm(enumerate(spot_quote_market), desc="Tickers Quotation", total=len(spot_quote_market)):
+    for ticker in tqdm(enumerate(spot_quote_market), desc="Tickers Quotation", total=len(spot_quote_market), colour='green',  disable=False):
         try:
             spot_ticker_info = spot_market.spot_ticker_information(ticker[1]['id'])
             if not isinstance(spot_ticker_info, tuple):
@@ -54,7 +54,7 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df):
     arb_df_btc_last = []
     arb_df_eth_last = []
     btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
-    for market in tqdm(spot_USDT_df.iterrows(), desc="Acquiring Price", total=len(spot_USDT_df)):
+    for market in tqdm(spot_USDT_df.iterrows(), desc="Acquiring Price", total=len(spot_USDT_df), colour='red',  disable=True):
         try:
             arb_df_usdt_last.append(market[1]['last'])
             arb_df_ticker.append(market[1]['ticker'])
@@ -83,7 +83,7 @@ def remove_unwanted_from_df(arb_df):
     global btc_price_diff_pct, eth_price_diff_pct
     filtered_arb_df = arb_df[~((arb_df['btc_last'] == 0) & (arb_df['eth_last'] == 0))]
     rows_to_remove = []
-    for index, market in tqdm(filtered_arb_df.iterrows(), total=len(filtered_arb_df), desc='DF Creation'):
+    for index, market in tqdm(filtered_arb_df.iterrows(), total=len(filtered_arb_df), desc='DF Creation', colour='white', disable=True):
         btc_last_price = market['btc_last']
         eth_last_price = market['eth_last']
         usdt_last_price = market['usdt_last']
@@ -96,7 +96,7 @@ def remove_unwanted_from_df(arb_df):
             denominator = eth_last_price if eth_last_price > usdt_last_price else usdt_last_price
             eth_price_diff_pct = (numerator / denominator) * 100
 
-        if btc_price_diff_pct < 0.1 and eth_price_diff_pct < 0.1:
+        if btc_price_diff_pct < 0.3 and eth_price_diff_pct < 0.3:
             rows_to_remove.append(index)
             btc_price_diff_pct = eth_price_diff_pct = 0.00
 
