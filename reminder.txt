@@ -1,4 +1,5 @@
 to do---
+termination of application
 
 completed-----
 change [:50] and < 0.1 b4 launch
