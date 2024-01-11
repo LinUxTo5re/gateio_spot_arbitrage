@@ -30,7 +30,7 @@ def arbitrage_existing_json():
         arb_df = json.load(file)
 
 
-def while_loop(timer=5):  # timer == sleep_time
+def while_loop(timer=25):  # timer == sleep_time
     global arb_df
     arbitrage_existing_json()
     while True and arb_df is not None and not arb_df == "":
