@@ -17,7 +17,8 @@ def arbitrage_json():
     new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market[:50])
     new_arb_df['ticker'].to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
     arbitrage_existing_json()
-    time.sleep(36000)  # sleeping to avoid more api calls and data get renewed to find fresh data
+    # 3600 == 1 hr
+    time.sleep(3600)  # sleeping to avoid more api calls and data get renewed to find fresh data
 
 
 def arbitrage_existing_json():
