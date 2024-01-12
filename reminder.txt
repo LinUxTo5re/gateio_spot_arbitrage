@@ -1,8 +1,9 @@
 to do---
-json on cloud 🌨️
 termination of application
 
 completed-----
+json on cloud 🌨️
+
 change [:50] and < 0.1 b4 launch
 
 handle if file_exists in gateio_main.py and make sure that you've added async to

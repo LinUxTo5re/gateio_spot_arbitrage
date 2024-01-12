@@ -53,5 +53,4 @@ def quote_live_market_price():
                 btc_usdt_price = extra_operations.binance_ticker(ticker)
             if ticker == 'ETH_USDT':
                 eth_usdt_price = extra_operations.binance_ticker(ticker)
-
     return float(btc_usdt_price), float(eth_usdt_price)
