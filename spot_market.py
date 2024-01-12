@@ -28,7 +28,7 @@ def spot_ticker_information(ticker):
         if float(spot_ticker_info[0]['last']) > 10.00:  # if price is more than $10 then ignore it
             return False, False
         return float(spot_ticker_info[0]['last'])
-    except Exception as e:
+    except Exception:
         return False, False
 
 
@@ -50,6 +50,6 @@ def live_spot_data(ticker):
         live_spot = requests.request('GET', host + prefix + spot_candlestick_url, params=query_param,
                                      headers=headers).json()
         return live_spot[0][2]
-    except Exception as e:
+    except Exception:
         time.sleep(5)
         return spot_ticker_information(ticker)

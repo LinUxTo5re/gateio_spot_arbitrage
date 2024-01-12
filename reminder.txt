@@ -1,4 +1,5 @@
 to do---
+to get data more fast in while_loop-- divide tickers in groups and create multiprocessing
 termination of application
 
 completed-----

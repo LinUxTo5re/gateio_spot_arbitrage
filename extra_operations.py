@@ -1,7 +1,8 @@
 import platform
 import subprocess
 import requests
-from shared import binance_ticker_price_url, pantry_id, file_path, file_name
+from shared import binance_ticker_price_url
+from datetime import datetime, timedelta
 
 
 def clear_terminal():
@@ -9,6 +10,13 @@ def clear_terminal():
         subprocess.call('cls', shell=True)
     else:
         subprocess.call('clear', shell=True)
+
+
+def wake_up_bro(second):
+    current_datetime = datetime.now()
+    added_seconds = timedelta(seconds=second)
+    new_datetime = current_datetime + added_seconds
+    return new_datetime.hour, new_datetime.minute
 
 
 def binance_ticker(ticker):
@@ -28,5 +36,5 @@ def binance_ticker(ticker):
             else:
                 eth_usdt_price = 0.00
             return float(eth_usdt_price)
-    except Exception as e:
+    except Exception:
         return float(0.00)

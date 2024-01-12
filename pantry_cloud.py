@@ -1,5 +1,4 @@
 import time
-
 import requests
 import json
 from shared import pantry_id, file_name as basket_name, file_path
@@ -21,7 +20,7 @@ def create_replace_basket(json_data=None, is_download=False):
                 dict_data = list(downloaded_json_data.json().keys())
                 with open(file_path, 'w') as file:
                     json.dump(dict_data, file)
-        except Exception as e:
+        except Exception:
             print(f"\n Warning: can't load data from pantry cloud to {basket_name}, sleeping: 30s ")
             time.sleep(30)
     else:
@@ -58,5 +57,5 @@ def download_file():
             'Content-Type': 'application/json'
         }
         return requests.request("GET", url, headers=headers, data=payload)
-    except Exception as e:
+    except Exception:
         return "NO DATA"
