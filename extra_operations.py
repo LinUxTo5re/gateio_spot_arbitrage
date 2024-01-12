@@ -1,7 +1,7 @@
 import platform
 import subprocess
 import requests
-from shared import binance_ticker_price_url
+from shared import binance_ticker_price_url, pantry_id, file_path, file_name
 
 
 def clear_terminal():

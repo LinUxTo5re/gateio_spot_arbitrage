@@ -2,10 +2,12 @@ import json
 import sys
 import time
 import extra_operations
+import pantry_cloud
 import spot_market
 import arbitrage_handle
 import live_market
 from multiprocessing import Process
+from shared import file_path
 
 # global variables
 arb_df = ""
@@ -17,16 +19,19 @@ def arbitrage_json():
         spot_market_list = spot_market.spot_markets_list()
         spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
         spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
-        new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
-        new_arb_df['ticker'].to_json('arb_df_bak.json', orient='records')  # Overwrite existing file if exists
+        new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market[:20])
+
+        new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
         arbitrage_existing_json()
+        pantry_cloud.create_replace_basket(new_arb_df)
         # 900 == 15 m
+        print("uploaded......")
         time.sleep(900)  # sleeping to avoid more api calls and data get renewed to find fresh data
 
 
 def arbitrage_existing_json():
     global arb_df
-    with open('arb_df_bak.json', 'r') as file:
+    with open(file_path, 'r') as file:
         arb_df = json.load(file)
 
 
@@ -54,7 +59,7 @@ if __name__ == '__main__':
     else:
         process_while_loop = Process(target=while_loop)
         process_new_json = Process(target=arbitrage_json)
-        process_while_loop.start()
+        # process_while_loop.start()
         process_new_json.start()
         # no needed in our case, it blocks the execution of rest of code after .start()
         '''
