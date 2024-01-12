@@ -51,7 +51,7 @@ def while_loop(timer=20):  # timer == sleep_time
         try:
             arbitrage_existing_json()
             if len(arb_df):
-                print("\n Fetching Live Market Started.......")
+                print(f"\n Fetching {len(arb_df)} Live Market Started .......")
                 print("\n", live_market.live_market_price(arb_df).to_string(index=False))
                 new_datetime = wake_up_bro(timer)
                 print(f"\n [while_loop] will wake up on: {new_datetime.hour} : {new_datetime.minute}'O ")

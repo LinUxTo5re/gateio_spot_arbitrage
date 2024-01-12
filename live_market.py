@@ -13,7 +13,7 @@ def live_market_price(arb_df):
         columns=['ticker', 'usdt_lp', 'eth_lp', 'btc_lp'])
     usdt_live_data = eth_live_data = btc_live_data = ""
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
-    for market in tqdm(arb_df, desc="Live Price", total=len(arb_df)):
+    for market in tqdm(arb_df, desc="Live Price", total=len(arb_df), disable=True):  # tqdm bar has been disabled
         for quote in quote_list:
             live_data = live_spot_data(market + quote)
             if isinstance(live_data, tuple):
