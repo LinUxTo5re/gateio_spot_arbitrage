@@ -16,7 +16,7 @@ def wake_up_bro(second):
     current_datetime = datetime.now()
     added_seconds = timedelta(seconds=second)
     new_datetime = current_datetime + added_seconds
-    return new_datetime.hour, new_datetime.minute
+    return new_datetime.hour, new_datetime.minute, new_datetime.second
 
 
 def binance_ticker(ticker):

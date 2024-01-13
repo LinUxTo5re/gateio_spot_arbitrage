@@ -1,6 +1,6 @@
 import warnings
 import extra_operations
-from spot_market import live_spot_data
+from spot_market import live_spot_data, spot_order_book
 import pandas as pd
 from shared import btc_eth_list, quote_list
 from tqdm import tqdm
@@ -10,28 +10,42 @@ def live_market_price(arb_df):
     # Suppress FutureWarnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
     live_prices_df = pd.DataFrame(
-        columns=['ticker', 'usdt_lp', 'eth_lp', 'btc_lp'])
-    usdt_live_data = eth_live_data = btc_live_data = ""
+        columns=['ticker', 'min_max', 'diffr($10_fee_included)'])
+    usdt_live_data_min = eth_live_data_min = btc_live_data_min = 0
+    usdt_live_data_max = eth_live_data_max = btc_live_data_max = 0
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
     for market in tqdm(arb_df, desc="Live Price", total=len(arb_df), disable=True):  # tqdm bar has been disabled
         for quote in quote_list:
-            live_data = live_spot_data(market + quote)
-            if isinstance(live_data, tuple):
-                live_data = 0.00
+            live_data_seller_price, live_data_buyer_price = spot_order_book(market + quote)
             if quote == '_USDT':
-                usdt_live_data = float(live_data)
+                usdt_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price))
+                usdt_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price))
             if quote == '_ETH':
-                eth_live_data = float(live_data) * eth_usdt_price
+                eth_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price)) * eth_usdt_price
+                eth_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price)) * eth_usdt_price
             if quote == '_BTC':
-                btc_live_data = float(live_data) * btc_usdt_price
-        min_quote_price = min(usdt_live_data, btc_live_data, eth_live_data)
-        max_quote_price = max(usdt_live_data, btc_live_data, eth_live_data)
+                btc_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price)) * btc_usdt_price
+                btc_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price)) * btc_usdt_price
+
+        min_variables_value = [('usdt', usdt_live_data_min), ('eth', eth_live_data_min), ('btc', btc_live_data_min)]
+        max_variables_value = [('usdt', usdt_live_data_max), ('eth', eth_live_data_max), ('btc', btc_live_data_max)]
+        min_variable_tuple = min(min_variables_value, key=lambda x: x[1])
+        min_variable_name, min_variable_value = min_variable_tuple
+        # remove common quote from max_ list
+        if min_variable_name == 'usdt':
+            max_variables_value.pop(0)
+        elif min_variable_name == 'eth':
+            max_variables_value.pop(1)
+        else:
+            max_variables_value.pop(2)
+        max_variable_tuple = max(max_variables_value, key=lambda x: x[1])
+        max_variable_name, max_variable_value = max_variable_tuple
+
         live_data_dict = {
-            'ticker': market,  # _lp - last price
-            'usdt_lp': usdt_live_data,
-            'eth_lp': eth_live_data,
-            'btc_lp': btc_live_data,
-            'diffr($10)': (max_quote_price - min_quote_price) * (10/min_quote_price)  # profit on $10 trade (assumed)
+            'ticker': market,
+            'min_max': min_variable_name + '->' + max_variable_name,  # 'usdt -> btc'
+            'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (10 / min_variable_value) - 0.04)
+            # profit on $10 trade with 0.04 fee (assumed)
         }
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
         live_data_tmp.dropna(axis=1, how='all', inplace=True)
