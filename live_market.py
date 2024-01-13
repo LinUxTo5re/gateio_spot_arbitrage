@@ -31,7 +31,7 @@ def live_market_price(arb_df):
             'usdt_lp': usdt_live_data,
             'eth_lp': eth_live_data,
             'btc_lp': btc_live_data,
-            'diffr($10)': (max_quote_price - min_quote_price) * 10  # profit on $10 trade (assumed)
+            'diffr($10)': (max_quote_price - min_quote_price) * (10/min_quote_price)  # profit on $10 trade (assumed)
         }
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
         live_data_tmp.dropna(axis=1, how='all', inplace=True)
