@@ -15,29 +15,44 @@ def live_market_price(arb_df):
     usdt_live_data_max = eth_live_data_max = btc_live_data_max = 0
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
     for market in tqdm(arb_df, desc="Live Price", total=len(arb_df), disable=True):  # tqdm bar has been disabled
-        for quote in quote_list:
-            live_data_seller_price, live_data_buyer_price = spot_order_book(market + quote)
-            if quote == '_USDT':
-                usdt_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price))
-                usdt_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price))
-            if quote == '_ETH':
-                eth_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price)) * eth_usdt_price
-                eth_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price)) * eth_usdt_price
-            if quote == '_BTC':
-                btc_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price)) * btc_usdt_price
-                btc_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price)) * btc_usdt_price
-
+        try:
+            for quote in quote_list:
+                try:
+                    live_data_seller_price, live_data_buyer_price = spot_order_book(market + quote)
+                    if quote == '_USDT':
+                        usdt_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price))
+                        usdt_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price))
+                    if quote == '_ETH':
+                        eth_live_data_min = min(float(live_data_seller_price),
+                                                float(live_data_buyer_price)) * eth_usdt_price
+                        eth_live_data_max = max(float(live_data_seller_price),
+                                                float(live_data_buyer_price)) * eth_usdt_price
+                    if quote == '_BTC':
+                        btc_live_data_min = min(float(live_data_seller_price),
+                                                float(live_data_buyer_price)) * btc_usdt_price
+                        btc_live_data_max = max(float(live_data_seller_price),
+                                                float(live_data_buyer_price)) * btc_usdt_price
+                except Exception:
+                    pass
+        except Exception as e:
+            extra_operations.clear_terminal()
         min_variables_value = [('usdt', usdt_live_data_min), ('eth', eth_live_data_min), ('btc', btc_live_data_min)]
+        min_variables_value = list(filter(lambda x: x[1] != 0, min_variables_value))  # remove variable with zero value
         max_variables_value = [('usdt', usdt_live_data_max), ('eth', eth_live_data_max), ('btc', btc_live_data_max)]
+        max_variables_value = list(filter(lambda x: x[1] != 0, max_variables_value))
         min_variable_tuple = min(min_variables_value, key=lambda x: x[1])
         min_variable_name, min_variable_value = min_variable_tuple
+
         # remove common quote from max_ list
         if min_variable_name == 'usdt':
             max_variables_value.pop(0)
         elif min_variable_name == 'eth':
             max_variables_value.pop(1)
-        else:
-            max_variables_value.pop(2)
+        elif min_variable_name == 'btc':
+            if len(max_variables_value) == 3:
+                max_variables_value.pop(2)
+            else:
+                max_variables_value.pop(1)
         max_variable_tuple = max(max_variables_value, key=lambda x: x[1])
         max_variable_name, max_variable_value = max_variable_tuple
 
@@ -50,6 +65,7 @@ def live_market_price(arb_df):
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
         live_data_tmp.dropna(axis=1, how='all', inplace=True)
         live_prices_df = pd.concat([live_prices_df, live_data_tmp], ignore_index=True)
+    live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= 0.2]  # return only diffr >= $0.2 (2%)
     return live_prices_df
 
 

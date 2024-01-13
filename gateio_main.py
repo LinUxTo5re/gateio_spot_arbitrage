@@ -30,7 +30,7 @@ def arbitrage_json():
             print(f"\n [new json data] Total Live Markets(>1%): {len(arb_df)}")
             new_datetime = wake_up_bro(sleep_timer)
             print(f"\n [new json data] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
-            # 900 == 15 minutes
+            # 1800 == 30 minutes
             time.sleep(sleep_timer)  # sleeping to avoid more api calls and data get renewed to find fresh data
         except Exception:
             clear_terminal()  # clear terminal
@@ -61,7 +61,7 @@ def while_loop(timer=20):  # timer == sleep_time
                 sleep_timer_half = sleep_timer_half / 2
                 print(f"\n [while_loop] sleeping for {sleep_timer_half}s............")
                 time.sleep(sleep_timer_half)
-        except Exception:
+        except Exception as e:
             clear_terminal()  # clear terminal
 
 

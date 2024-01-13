@@ -102,7 +102,7 @@ def remove_unwanted_from_df(arb_df):
                 denominator = (eth_last_price + usdt_last_price) / 2
                 eth_price_diff_pct = round((numerator / denominator) * 100, 2)
 
-            if btc_price_diff_pct < 3 and eth_price_diff_pct < 3:
+            if btc_price_diff_pct < 2 and eth_price_diff_pct < 2:
                 rows_to_remove.append(index)
                 btc_price_diff_pct = eth_price_diff_pct = 0.00
         except Exception as e:

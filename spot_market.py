@@ -35,9 +35,12 @@ def spot_ticker_information(ticker):
 # spot ticker order book to get low asks and high bids
 def spot_order_book(ticker):
     query_param = f'currency_pair={ticker}'
-    ticker_order_book = requests.request('GET', host + prefix + spot_order_book_url + "?" + query_param,
-                                         headers=headers).json()
-    return ticker_order_book['asks'][0][0], ticker_order_book['bids'][0][0]
+    try:
+        ticker_order_book = requests.request('GET', host + prefix + spot_order_book_url + "?" + query_param,
+                                             headers=headers).json()
+        return ticker_order_book['asks'][0][0], ticker_order_book['bids'][0][0]
+    except Exception:
+        return 0, 0
 
 
 # live spot ticker data(10s) to be used with live future data (close price as last_price)
