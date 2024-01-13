@@ -1,11 +1,13 @@
 to do---
-to get data more fast in while_loop-- divide tickers in groups and create multiprocessing
+live_market_price sort by price to get higher price first on screen
 termination of application
 
 completed-----
 json on cloud 🌨️
-
 change [:50] and < 0.1 b4 launch
-
 handle if file_exists in gateio_main.py and make sure that you've added async to
 continue to update of json data if exists
+
+on hold-----
+to get data more fast in while_loop-- divide tickers in groups and create multiprocessing
+

@@ -27,7 +27,7 @@ def arbitrage_json():
             new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
             pantry_cloud.create_replace_basket(new_arb_df)
             arbitrage_existing_json()
-            print(f"\n [new json data] Total Live Markets(>1%): {len(arb_df)}")
+            print(f"\n [new json data] Total Live Markets(>2%): {len(arb_df)}")
             new_datetime = wake_up_bro(sleep_timer)
             print(f"\n [new json data] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
             # 1800 == 30 minutes
