@@ -25,7 +25,7 @@ def spot_ticker_information(ticker):
     try:
         spot_ticker_info = requests.request('GET', host + prefix + spot_ticker_info_url, headers=headers,
                                             params=query_param).json()
-        if float(spot_ticker_info[0]['last']) > 10.00:  # if price is more than $10 then ignore it
+        if float(spot_ticker_info[0]['last']) > max_usdt_price:  # if price is more than $10 then ignore it
             return False, False
         return float(spot_ticker_info[0]['last'])
     except Exception:

@@ -16,3 +16,6 @@ folder_name = "JSON"
 file_name = "arb_df_bak.json"
 file_path = os.path.join(os.getcwd(), folder_name, file_name)
 sleep_timer = 1800
+max_usdt_price = 10.00
+exclude_price_diffr = 0.2
+exclude_price_diffr_pct = 2

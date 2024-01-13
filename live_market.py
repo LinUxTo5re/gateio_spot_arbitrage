@@ -1,6 +1,6 @@
 import warnings
 import extra_operations
-from spot_market import live_spot_data, spot_order_book
+from spot_market import live_spot_data, spot_order_book, exclude_price_diffr
 import pandas as pd
 from shared import btc_eth_list, quote_list
 from tqdm import tqdm
@@ -23,7 +23,8 @@ def live_market_price(arb_df):
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
         live_data_tmp.dropna(axis=1, how='all', inplace=True)
         live_prices_df = pd.concat([live_prices_df, live_data_tmp], ignore_index=True)
-    live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= 0.2]  # return only diffr >= $0.2 (2%)
+    # return only diffr >= $0.2 (2% of 10)
+    live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= exclude_price_diffr]
     return live_prices_df
 
 
