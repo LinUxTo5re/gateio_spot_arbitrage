@@ -19,4 +19,4 @@ sleep_timer = 1800
 max_usdt_price = 10.00
 exclude_price_diffr = 0.2
 exclude_price_diffr_pct = 2
-assumed_usdt_fee = 0.04
+assumed_usdt_fee = 0.04  # fee on one complete Transaction (buy and sell == one Transaction)

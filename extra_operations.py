@@ -1,21 +1,22 @@
-import platform
-import subprocess
+from platform import system
+from subprocess import call
+import time
 import requests
 from shared import binance_ticker_price_url
 from datetime import datetime, timedelta
 
 
 def clear_terminal():
-    if platform.system() == 'Windows':
-        subprocess.call('cls', shell=True)
+    if system() == 'Windows':
+        call('cls', shell=True)
     else:
-        subprocess.call('clear', shell=True)
+        call('clear', shell=True)
 
 
 def wake_up_bro(second):
-    current_datetime = datetime.now()
+    new_current_datetime = datetime.now()
     added_seconds = timedelta(seconds=second)
-    new_datetime = current_datetime + added_seconds
+    new_datetime = new_current_datetime + added_seconds
     return new_datetime.hour, new_datetime.minute, new_datetime.second
 
 

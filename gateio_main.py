@@ -6,7 +6,7 @@ import spot_market
 import arbitrage_handle
 import live_market
 from multiprocessing import Process
-from shared import file_path, sleep_timer
+from shared import file_path, sleep_timer, file_name
 import os
 from extra_operations import wake_up_bro, clear_terminal
 
@@ -38,10 +38,12 @@ def arbitrage_json():
 
 def arbitrage_existing_json():
     global arb_df
+    print(f"\n Downloading {file_name} ..........")
     pantry_cloud.create_replace_basket(is_download=True)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as file:
             arb_df = json.load(file)
+    print(f"\n Download Completed for {file_name}")
 
 
 def while_loop(timer=20):  # timer == sleep_time
@@ -49,19 +51,18 @@ def while_loop(timer=20):  # timer == sleep_time
     arbitrage_existing_json()
     while True:
         try:
-            arbitrage_existing_json()
             if len(arb_df):
                 print(f"\n Fetching {len(arb_df)} Live Market Started .......")
                 print("\n", live_market.live_market_price(arb_df).to_string(index=False))
-                new_datetime = wake_up_bro(timer)
-                print(f"\n [while_loop] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
+                while_new_datetime = wake_up_bro(timer)
+                print(
+                    f"\n [while_loop] will wake up at: {while_new_datetime[0]}:{while_new_datetime[1]}:{while_new_datetime[2]}")
                 time.sleep(timer)  # take a breath
-
             else:
                 sleep_timer_half = sleep_timer_half / 2
-                print(f"\n [while_loop] sleeping for {sleep_timer_half}s............")
+                print(f"\n [while_loop] sleeping for {sleep_timer_half} seconds............")
                 time.sleep(sleep_timer_half)
-        except Exception as e:
+        except Exception:
             clear_terminal()  # clear terminal
 
 
