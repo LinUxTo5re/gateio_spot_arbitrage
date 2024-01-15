@@ -1,6 +1,6 @@
 import warnings
 import extra_operations
-from spot_market import live_spot_data, spot_order_book, exclude_price_diffr
+from spot_market import live_spot_data, spot_order_book, exclude_price_diffr, assumed_usdt_fee
 import pandas as pd
 from shared import btc_eth_list, quote_list
 from tqdm import tqdm
@@ -17,7 +17,7 @@ def live_market_price(arb_df):
         live_data_dict = {
             'ticker': market,
             'min_max': min_variable_name + '->' + max_variable_name,  # 'usdt -> btc'
-            'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (10 / min_variable_value) - 0.04)
+            'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (10 / min_variable_value) - assumed_usdt_fee)
             # profit on $10 trade with 0.04 fee (assumed)
         }
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
@@ -25,6 +25,8 @@ def live_market_price(arb_df):
         live_prices_df = pd.concat([live_prices_df, live_data_tmp], ignore_index=True)
     # return only diffr >= $0.2 (2% of 10)
     live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= exclude_price_diffr]
+    live_prices_df = live_prices_df.sort_values(by='diffr($10_fee_included)', ascending=False).copy()
+    print(f"\n Total Fetched: {len(live_prices_df)} Markets")
     return live_prices_df
 
 
