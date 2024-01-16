@@ -1,4 +1,5 @@
 to do---
+create procedure to check live_data for passed market as parameter
 spot trade account api's to automate all trades
 
 completed-----
