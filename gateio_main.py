@@ -12,12 +12,12 @@ import signal
 from extra_operations import wake_up_bro, clear_terminal, signal_handler
 
 # global variables
-arb_df = ""
+updated_arb_df = ""
 sleep_timer_half = sleep_timer
 
 
 def arbitrage_json():
-    global arb_df
+    global updated_arb_df
     while True:
         try:
             print("\n [new json data] Fetching Started............")
@@ -28,7 +28,7 @@ def arbitrage_json():
             new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
             pantry_cloud.create_replace_basket(new_arb_df)
             arbitrage_existing_json()
-            print(f"\n [new json data] Total Live Markets(>2%): {len(arb_df)}")
+            print(f"\n [new json data] Total Live Markets(>2%): {len(updated_arb_df)}")
             new_datetime = wake_up_bro(sleep_timer)
             print(f"\n [new json data] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
             # 1800 == 30 minutes
@@ -38,21 +38,25 @@ def arbitrage_json():
 
 
 def arbitrage_existing_json():
-    global arb_df
+    global updated_arb_df
     print(f"\n Downloading {file_name} ..........")
     pantry_cloud.create_replace_basket(is_download=True)
     if os.path.isfile(file_path):
         with open(file_path, 'r') as file:
-            arb_df = json.load(file)
+            updated_arb_df = json.load(file)
     print(f"\n Download Completed for {file_name}")
 
 
 def while_loop(timer=20):  # timer == sleep_time
-    global arb_df, sleep_timer_half
+    global sleep_timer_half, updated_arb_df
     arbitrage_existing_json()
+    arb_df = updated_arb_df
     while True:
         try:
             if len(arb_df):
+                if len(updated_arb_df) > 0:
+                    arb_df = updated_arb_df
+                    updated_arb_df = ""
                 print(f"\n Fetching {len(arb_df)} Live Market Started .......")
                 print("\n", live_market.live_market_price(arb_df).to_string(index=False))
                 while_new_datetime = wake_up_bro(timer)
