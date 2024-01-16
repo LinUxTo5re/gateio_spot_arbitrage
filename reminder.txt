@@ -1,8 +1,8 @@
 to do---
-create procedure to check live_data for passed market as parameter
 spot trade account api's to automate all trades
 
 completed-----
+create procedure to check live_data for passed market as parameter
 termination of application
 json on cloud 🌨️
 change [:50] and < 0.1 b4 launch
