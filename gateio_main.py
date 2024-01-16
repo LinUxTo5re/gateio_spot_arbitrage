@@ -47,9 +47,10 @@ def arbitrage_existing_json():
     print(f"\n Download Completed for {file_name}")
 
 
-def while_loop(timer=20):  # timer == sleep_time
+def while_loop(timer=20, passed_markets=False):  # timer == sleep_time
     global sleep_timer_half, updated_arb_df
-    arbitrage_existing_json()
+    if not passed_markets:
+        arbitrage_existing_json()
     arb_df = updated_arb_df
     while True:
         try:
@@ -80,6 +81,9 @@ if __name__ == '__main__':
                 if len(sys.argv) > 2:
                     sleep_time = int(sys.argv[2])
                     while_loop(sleep_time)
+            else:  # live data with passed markets
+                updated_arb_df = [market.upper() for market in sys.argv[1:]]
+                while_loop(10, True)
         else:
             process_while_loop = Process(target=while_loop)
             process_new_json = Process(target=arbitrage_json)

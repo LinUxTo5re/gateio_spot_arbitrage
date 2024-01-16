@@ -40,7 +40,7 @@ def binance_ticker(ticker):
         return float(0.00)
 
 
-# Terminate application with 'SIGINT'(Ctrl + C)
+# Terminate application with 'SIGINT'(Ctrl + C) (only parameterized calling)
 def signal_handler(signum, frame):
     print("Exiting Application....")
     exit(0)
