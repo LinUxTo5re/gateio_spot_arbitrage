@@ -8,7 +8,8 @@ import live_market
 from multiprocessing import Process
 from shared import file_path, sleep_timer, file_name
 import os
-from extra_operations import wake_up_bro, clear_terminal
+import signal
+from extra_operations import wake_up_bro, clear_terminal, signal_handler
 
 # global variables
 arb_df = ""
@@ -68,6 +69,7 @@ def while_loop(timer=20):  # timer == sleep_time
 
 if __name__ == '__main__':
     try:
+        signal.signal(signal.SIGINT, signal_handler)  # Terminate on CTRL + C
         if len(sys.argv) > 1:
             function_name = sys.argv[1]
             if function_name == 'while_loop':

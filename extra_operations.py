@@ -1,6 +1,5 @@
 from platform import system
 from subprocess import call
-import time
 import requests
 from shared import binance_ticker_price_url
 from datetime import datetime, timedelta
@@ -39,3 +38,9 @@ def binance_ticker(ticker):
             return float(eth_usdt_price)
     except Exception:
         return float(0.00)
+
+
+# Terminate application with 'SIGINT'(Ctrl + C)
+def signal_handler(signum, frame):
+    print("Exiting Application....")
+    exit(0)
