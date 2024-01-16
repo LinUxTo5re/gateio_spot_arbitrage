@@ -5,3 +5,7 @@
 __pycache__/
 
 tmp.py
+
+gateio_credentials.py
+
+Live_Trade/gateio_credentials.py
