@@ -25,3 +25,6 @@ assumed_usdt_fee = 0.04  # fee on one complete Transaction (buy and sell == one 
 SPOT ORDERS
 '''
 spot_create_order_url = '/spot/orders'
+track_single_order_url = '/spot/orders/'
+spot_accounts_url = '/spot/accounts'
+

@@ -1,13 +1,10 @@
 import time
 import hashlib
 import hmac
-from gateio_credentials import secret_key, api_key
+from gateio_credentials import key, secret
 
 
 def gen_sign(method, url, query_string=None, payload_string=None):
-    key = api_key  # api_key
-    secret = secret_key  # api_secret
-
     t = time.time()
     m = hashlib.sha512()
     m.update((payload_string or "").encode('utf-8'))

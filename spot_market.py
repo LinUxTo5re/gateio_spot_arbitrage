@@ -33,11 +33,13 @@ def spot_ticker_information(ticker):
 
 
 # spot ticker order book to get low asks and high bids
-def spot_order_book(ticker):
+def spot_order_book(ticker, order_initialized=False):
     query_param = f'currency_pair={ticker}'
     try:
         ticker_order_book = requests.request('GET', host + prefix + spot_order_book_url + "?" + query_param,
                                              headers=headers).json()
+        if order_initialized:
+            return ticker_order_book['asks'][0], ticker_order_book['bids'][0]
         return ticker_order_book['asks'][0][0], ticker_order_book['bids'][0][0]
     except Exception:
         return 0, 0
