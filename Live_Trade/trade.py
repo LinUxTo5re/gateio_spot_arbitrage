@@ -1,5 +1,4 @@
 import sys
-
 import spot_market
 from gen_sign import gen_sign
 from shared import *
