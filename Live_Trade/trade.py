@@ -3,6 +3,7 @@ import spot_market
 from gen_sign import gen_sign
 from shared import *
 import requests
+from spot_extra_operations import check_account_balance
 
 is_arbitrage_completed = 0
 
@@ -31,7 +32,7 @@ def create_an_order(currency_pair, side, ask_bid_price, amount):
 
 
 def track_buy_order(currency_pair, side, ask_bid_price):
-    order_response = create_an_order(currency_pair, side, ask_bid_price, max_usdt_price)
+    order_response = create_an_order(currency_pair, side, ask_bid_price, trade_amount)
     order_id = order_response['id']
     query_param = f'currency_pair={order_response['currency_pair']}'
     # for `gen_sign` implementation, refer to section `Authentication` above
@@ -54,15 +55,17 @@ bid: buyers are willing to buy
 
 
 def order_initialization(market, buy_quote_name, sell_quote_name=''):
-    ask_data, bid_data = spot_market.spot_order_book(market.upper() + '_' + buy_quote_name.upper(), True)
-    if float(ask_data[0]) * float(ask_data[1]) >= max_usdt_price:  # buy order
-        track_buy_order(market.upper() + '_' + buy_quote_name.upper(), 'buy', float(ask_data[0]))
-    ask_data, bid_data = spot_market.spot_order_book(market.upper() + '_' + sell_quote_name.upper(), True)
-    if float(bid_data[0]) * float(bid_data[1]) >= max_usdt_price:  # sell order
-        track_buy_order(market.upper() + '_' + buy_quote_name.upper(), 'buy', float(bid_data[0]))
-
-
-
+    available_bal = check_account_balance(buy_quote_name)
+    if available_bal >= trade_amount:
+        ask_data, bid_data = spot_market.spot_order_book(market.upper() + '_' + buy_quote_name.upper(), True)
+        if float(ask_data[0]) * float(ask_data[1]) >= trade_amount:  # buy order
+            track_buy_order(market.upper() + '_' + buy_quote_name.upper(), 'buy', float(ask_data[0]))
+        ask_data, bid_data = spot_market.spot_order_book(market.upper() + '_' + sell_quote_name.upper(), True)
+        if float(bid_data[0]) * float(bid_data[1]) >= trade_amount:  # sell order
+            track_buy_order(market.upper() + '_' + buy_quote_name.upper(), 'buy', float(bid_data[0]))
+        print(f"\n Trade executed successfully \n PNL: ")  # TO DO
+    else:
+        print(f"\n Insufficient {buy_quote_name}  Avl Bal: {available_bal} \n Existing.....")
 
 
 if __name__ == '__main__':
