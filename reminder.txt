@@ -1,6 +1,8 @@
 to do---
+take asks/bids in action before making trade-- check, is their enough number of quantities to buy/sell of $10
 fix trade_amount conversion for noo-usdt quote assets --IMP
 spot trade account api's to automate all trades
+fix these three and take trade after these, no trade before
 
 completed-----
 create procedure to check live_data for passed market as parameter
@@ -14,5 +16,4 @@ live_market_price sort by price to get higher price first on screen.
 on hold-----
 PNL formula in trade.py
 to get data more fast in while_loop-- divide tickers in groups and create multiprocessing
-take asks/bids in action before making trade-- check, is their enough number of quantities to buy/sell of $10
 
