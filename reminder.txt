@@ -1,4 +1,5 @@
 to do---
+fix trade_amount conversion for noo-usdt quote assets --IMP
 spot trade account api's to automate all trades
 
 completed-----
@@ -11,6 +12,7 @@ continue to update of json data if exists.
 live_market_price sort by price to get higher price first on screen.
 
 on hold-----
+PNL formula in trade.py
 to get data more fast in while_loop-- divide tickers in groups and create multiprocessing
 take asks/bids in action before making trade-- check, is their enough number of quantities to buy/sell of $10
 
