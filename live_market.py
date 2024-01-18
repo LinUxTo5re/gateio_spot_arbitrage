@@ -16,7 +16,7 @@ def live_market_price(arb_df):
         min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(market,btc_usdt_price,eth_usdt_price)
         live_data_dict = {
             'ticker': market,
-            'min_max': min_variable_name + '->' + max_variable_name,  # 'usdt -> btc'
+            'min_max': min_variable_name + '->' + max_variable_name,  # usdt -> btc
             'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (max_usdt_price / min_variable_value) - assumed_usdt_fee)
             # profit on $10 trade with 0.04 fee (assumed)
         }
@@ -37,23 +37,23 @@ def live_market_price_ext(market, btc_usdt_price, eth_usdt_price):
     try:
         for quote in quote_list:
             try:
+                # getting asks and bids price resp.
+                # I'll but at seller price(asks) and sell at buyer price(bids)
                 live_data_seller_price, live_data_buyer_price = spot_order_book(market + quote)
+                # _min: seller price(asks)..buy at this price
+                # _max: buyer price(bids)..sell at this price
                 if quote == '_USDT':
-                    usdt_live_data_min = min(float(live_data_seller_price), float(live_data_buyer_price))
-                    usdt_live_data_max = max(float(live_data_seller_price), float(live_data_buyer_price))
+                    usdt_live_data_min = float(live_data_seller_price)
+                    usdt_live_data_max = float(live_data_buyer_price)
                 if quote == '_ETH':
-                    eth_live_data_min = min(float(live_data_seller_price),
-                                            float(live_data_buyer_price)) * eth_usdt_price
-                    eth_live_data_max = max(float(live_data_seller_price),
-                                            float(live_data_buyer_price)) * eth_usdt_price
+                    eth_live_data_min = float(live_data_seller_price) * eth_usdt_price
+                    eth_live_data_max = float(live_data_buyer_price) * eth_usdt_price
                 if quote == '_BTC':
-                    btc_live_data_min = min(float(live_data_seller_price),
-                                            float(live_data_buyer_price)) * btc_usdt_price
-                    btc_live_data_max = max(float(live_data_seller_price),
-                                            float(live_data_buyer_price)) * btc_usdt_price
+                    btc_live_data_min = float(live_data_seller_price) * btc_usdt_price
+                    btc_live_data_max = float(live_data_buyer_price) * btc_usdt_price
             except Exception:
                 pass
-    except Exception as e:
+    except Exception:
         extra_operations.clear_terminal()
     min_variables_value = [('usdt', usdt_live_data_min), ('eth', eth_live_data_min), ('btc', btc_live_data_min)]
     min_variables_value = list(filter(lambda x: x[1] != 0, min_variables_value))  # remove variable with zero value

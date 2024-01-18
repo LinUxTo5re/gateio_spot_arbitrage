@@ -1,6 +1,6 @@
 to do---
 take asks/bids in action before making trade-- check, is their enough number of quantities to buy/sell of $10
-fix trade_amount conversion for noo-usdt quote assets --IMP
+fix trade_amount conversion for non-usdt quote assets --IMP
 spot trade account api's to automate all trades
 fix these three and take trade after these, no trade before
 
