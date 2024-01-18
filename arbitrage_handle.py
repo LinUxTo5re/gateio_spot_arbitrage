@@ -57,9 +57,11 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df):
     arb_df_btc_last = []
     arb_df_eth_last = []
     btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
-    for market in tqdm(spot_USDT_df.iterrows(), desc="Acquiring Price", total=len(spot_USDT_df), colour='red',
-                       disable=True):
+    for index, market in tqdm(enumerate(spot_USDT_df.iterrows()), desc="Acquiring Price", total=len(spot_USDT_df),
+                              colour='red', disable=True):
         try:
+            if index % 20 == 0:
+                btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
             arb_df_usdt_last.append(market[1]['last'])
             arb_df_ticker.append(market[1]['ticker'])
             if market[1]['ticker'] in spot_BTC_df['ticker'].values:

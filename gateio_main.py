@@ -81,6 +81,8 @@ if __name__ == '__main__':
                 if len(sys.argv) > 2:
                     sleep_time = int(sys.argv[2])
                     while_loop(sleep_time)
+            elif function_name == 'new_data':
+                arbitrage_json()
             else:  # live data with passed markets
                 updated_arb_df = [market.upper() for market in sys.argv[1:]]
                 while_loop(10, True)

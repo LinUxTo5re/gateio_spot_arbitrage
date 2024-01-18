@@ -12,7 +12,10 @@ def live_market_price(arb_df):
     live_prices_df = pd.DataFrame(
         columns=['ticker', 'min_max', 'diffr($10_fee_included)'])
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
-    for market in tqdm(arb_df, desc="Live Price", total=len(arb_df), disable=True):  # tqdm bar has been disabled
+    for index, market in tqdm(enumerate(arb_df), desc="Live Price", total=len(arb_df), disable=True):
+        # tqdm bar has been disabled
+        if index % 3 == 0:
+            btc_usdt_price, eth_usdt_price = quote_live_market_price()
         min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(market,btc_usdt_price,eth_usdt_price)
         live_data_dict = {
             'ticker': market,
