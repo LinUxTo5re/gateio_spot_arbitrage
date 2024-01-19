@@ -32,22 +32,26 @@ def create_quote_df(spot_quote_market):
             btc_bases.append(entry['base'])
 
     spot_markets = set(usdt_bases).intersection(set(eth_bases + btc_bases))
-
-    for ticker in tqdm(spot_markets, desc="Tickers Quotation", total=len(spot_markets),
-                       colour='green', disable=False):
+    spot_ticker_info = spot_market.spot_ticker_information()
+    for i, ticker in tqdm(enumerate(spot_markets), desc="Tickers Quotation", total=len(spot_markets), colour='green',
+                          disable=False):
         try:
+            if (i+1) % 100 == 0:
+                spot_ticker_info = spot_market.spot_ticker_information()
             for quote in quote_list:
-                spot_ticker_info = spot_market.spot_ticker_information(ticker + quote)
-                if not isinstance(spot_ticker_info, tuple):
+                quote_ticker = ticker + quote
+                last_price = next((entry.get('last', None) for entry in spot_ticker_info if
+                                   quote_ticker in entry.get('currency_pair', '')), None)
+                if last_price:
                     if quote == '_USDT':
                         spot_USDT_ticker.append(ticker)
-                        spot_USDT_last.append(spot_ticker_info)
+                        spot_USDT_last.append(float(last_price))
                     elif quote == '_BTC':
                         spot_BTC_ticker.append(ticker)
-                        spot_BTC_last.append(spot_ticker_info)
+                        spot_BTC_last.append(float(last_price))
                     elif quote == '_ETH':
                         spot_ETH_ticker.append(ticker)
-                        spot_ETH_last.append(spot_ticker_info)
+                        spot_ETH_last.append(float(last_price))
                     else:
                         pass
                 else:
@@ -74,9 +78,9 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df):
 
     btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
     for index, market in tqdm(enumerate(spot_USDT_df.iterrows()), desc="Acquiring Price", total=len(spot_USDT_df),
-                              colour='red', disable=True):
+                              colour='red', disable=False):
         try:
-            if index % 20 == 0:
+            if (index + 1) % 20 == 0:
                 btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
             arb_df_usdt_last.append(market[1]['last'])
             arb_df_ticker.append(market[1]['ticker'])

@@ -20,14 +20,14 @@ def spot_quote_tradable_markets(spot_market_list):
 
 
 # spot ticker information to get last price of ticker
-def spot_ticker_information(ticker):
-    query_param = {"currency_pair": ticker}
+def spot_ticker_information():
+    query_param = ''
     try:
         spot_ticker_info = requests.request('GET', host + prefix + spot_ticker_info_url, headers=headers,
                                             params=query_param).json()
-        if float(spot_ticker_info[0]['last']) > max_usdt_price:  # if price is more than $10 then ignore it
-            return False, False
-        return float(spot_ticker_info[0]['last'])
+        # if float(spot_ticker_info[0]['last']) > max_usdt_price:  # if price is more than $10 then ignore it
+        #     return False
+        return spot_ticker_info
     except Exception:
         return False, False
 
@@ -56,5 +56,4 @@ def live_spot_data(ticker):
                                      headers=headers).json()
         return live_spot[0][2]
     except Exception:
-        time.sleep(5)
-        return spot_ticker_information(ticker)
+        return 0
