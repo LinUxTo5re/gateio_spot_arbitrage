@@ -2,7 +2,7 @@ import pandas as pd
 import live_market
 import spot_market
 from tqdm import tqdm
-from shared import exclude_price_diffr_pct
+from shared import exclude_price_diffr_pct, quote_list
 
 # global variables
 btc_price_diff_pct = eth_price_diff_pct = 0
@@ -19,24 +19,39 @@ def create_quote_df(spot_quote_market):
     spot_BTC_ticker = []
     spot_ETH_last = []
     spot_ETH_ticker = []
-    for ticker in tqdm(enumerate(spot_quote_market), desc="Tickers Quotation", total=len(spot_quote_market),
+    usdt_bases = []
+    eth_bases = []
+    btc_bases = []
+
+    for entry in spot_quote_market:
+        if entry['quote'] == 'USDT':
+            usdt_bases.append(entry['base'])
+        elif entry['quote'] == 'ETH':
+            eth_bases.append(entry['base'])
+        elif entry['quote'] == 'BTC':
+            btc_bases.append(entry['base'])
+
+    spot_markets = set(usdt_bases).intersection(set(eth_bases + btc_bases))
+
+    for ticker in tqdm(spot_markets, desc="Tickers Quotation", total=len(spot_markets),
                        colour='green', disable=False):
         try:
-            spot_ticker_info = spot_market.spot_ticker_information(ticker[1]['id'])
-            if not isinstance(spot_ticker_info, tuple):
-                if ticker[1]['quote'] == 'USDT':
-                    spot_USDT_ticker.append(ticker[1]['base'])
-                    spot_USDT_last.append(spot_ticker_info)
-                elif ticker[1]['quote'] == 'BTC':
-                    spot_BTC_ticker.append(ticker[1]['base'])
-                    spot_BTC_last.append(spot_ticker_info)
-                elif ticker[1]['quote'] == 'ETH':
-                    spot_ETH_ticker.append(ticker[1]['base'])
-                    spot_ETH_last.append(spot_ticker_info)
+            for quote in quote_list:
+                spot_ticker_info = spot_market.spot_ticker_information(ticker + quote)
+                if not isinstance(spot_ticker_info, tuple):
+                    if quote == '_USDT':
+                        spot_USDT_ticker.append(ticker)
+                        spot_USDT_last.append(spot_ticker_info)
+                    elif quote == '_BTC':
+                        spot_BTC_ticker.append(ticker)
+                        spot_BTC_last.append(spot_ticker_info)
+                    elif quote == '_ETH':
+                        spot_ETH_ticker.append(ticker)
+                        spot_ETH_last.append(spot_ticker_info)
+                    else:
+                        pass
                 else:
                     pass
-            else:
-                pass
         except Exception as e:
             print(f'\n{e}')
     # base == ticker
@@ -56,6 +71,7 @@ def create_possible_df(spot_USDT_df, spot_BTC_df, spot_ETH_df):
     arb_df_usdt_last = []
     arb_df_btc_last = []
     arb_df_eth_last = []
+
     btc_usdt_price, eth_usdt_price = live_market.quote_live_market_price()
     for index, market in tqdm(enumerate(spot_USDT_df.iterrows()), desc="Acquiring Price", total=len(spot_USDT_df),
                               colour='red', disable=True):

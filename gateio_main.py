@@ -25,10 +25,13 @@ def arbitrage_json():
             spot_market_list = [market for market in spot_market_list if market['trade_status'] == 'tradable']
             spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
             new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
-            new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
-            pantry_cloud.create_replace_basket(new_arb_df)
-            arbitrage_existing_json()
-            print(f"\n [new json data] Total Live Markets(>2%): {len(updated_arb_df)}")
+            if len(new_arb_df):
+                new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
+                pantry_cloud.create_replace_basket(new_arb_df)
+                arbitrage_existing_json()
+                print(f"\n [new json data] Total Live Markets(>2%): {len(updated_arb_df)}")
+            else:
+                print(f"\n NO ARBITRAGE FOUND")
             new_datetime = wake_up_bro(sleep_timer)
             print(f"\n [new json data] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
             # 1800 == 30 minutes
