@@ -12,7 +12,7 @@ def live_market_price(arb_df):
     live_prices_df = pd.DataFrame(
         columns=['ticker', 'min_max', 'diffr($10_fee_included)'])
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
-    for index, market in tqdm(enumerate(arb_df), desc="Live Price", total=len(arb_df), disable=True):
+    for index, market in tqdm(enumerate(arb_df), desc="Live Price", total=len(arb_df), disable=False):
         # tqdm bar has been disabled
         if index % 3 == 0:
             btc_usdt_price, eth_usdt_price = quote_live_market_price()
@@ -29,7 +29,10 @@ def live_market_price(arb_df):
     # return only diffr >= $0.2 (2% of 10)
     live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= exclude_price_diffr]
     live_prices_df = live_prices_df.sort_values(by='diffr($10_fee_included)', ascending=False).copy()
-    print(f"\n Total Fetched: {len(live_prices_df)} Markets")
+    if len(live_prices_df) > 0:
+        print(f"\n Total Fetched: {len(live_prices_df)} Markets")
+    else:
+        print(f"\n No Arbitrage Founded")
     return live_prices_df
 
 
