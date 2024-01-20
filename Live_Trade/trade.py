@@ -75,3 +75,5 @@ if __name__ == '__main__':
             sell_quote = sys.argv[3]
             order_initialization(market_name, buy_quote)
 
+    else:
+        pass
