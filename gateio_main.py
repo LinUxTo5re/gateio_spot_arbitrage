@@ -62,7 +62,7 @@ def while_loop(timer=20, passed_markets=False):  # timer == sleep_time
                     arb_df = updated_arb_df
                     updated_arb_df = ""
                 print(f"\n Fetching {len(arb_df)} Live Market Started .......")
-                print("\n", live_market.live_market_price(arb_df[:10]).to_string(index=False))
+                print("\n", live_market.live_market_price(arb_df).to_string(index=False))
                 while_new_datetime = wake_up_bro(timer)
                 print(
                     f"\n [while_loop] will wake up at: {while_new_datetime[0]}:{while_new_datetime[1]}:{while_new_datetime[2]}")

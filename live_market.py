@@ -16,11 +16,23 @@ def live_market_price(arb_df):
         # tqdm bar has been disabled
         if index % 3 == 0:
             btc_usdt_price, eth_usdt_price = quote_live_market_price()
-        min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(market,btc_usdt_price,eth_usdt_price)
+        min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(market,
+                                                                                                             btc_usdt_price,
+                                                                                                             eth_usdt_price)
+        min_price, max_price = min_variable_value, max_variable_value
+        if min_variable_name == 'eth':
+            min_price = min_variable_name / eth_usdt_price
+        elif max_variable_name == 'eth':
+            max_price = max_variable_value / eth_usdt_price
+        if min_variable_name == 'btc':
+            min_price = min_variable_value / btc_usdt_price
+        elif max_variable_name == 'btc':
+            max_price = max_variable_value / btc_usdt_price
         live_data_dict = {
             'ticker': market,
-            'min_max': min_variable_name + '->' + max_variable_name,  # usdt -> btc
-            'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (max_usdt_price / min_variable_value) - assumed_usdt_fee)
+            'min_max': f"{min_variable_name}({str(min_price)})->{max_variable_name}({str(max_price)})",  # usdt -> btc
+            'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (
+                        max_usdt_price / min_variable_value) - assumed_usdt_fee)
             # profit on $10 trade with 0.04 fee (assumed)
         }
         live_data_tmp = pd.DataFrame(live_data_dict, index=[0])
