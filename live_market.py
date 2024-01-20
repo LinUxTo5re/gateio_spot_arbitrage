@@ -11,7 +11,7 @@ def live_market_price(arb_df):
     # Suppress FutureWarnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
     live_prices_df = pd.DataFrame(
-        columns=['ticker', 'min_max', 'diffr($10_fee_included)'])
+        columns=['ticker', 'min_max', 'diffr(fee_included)'])
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
     try:
         for index, market in tqdm(enumerate(arb_df), desc="Live Price", total=len(arb_df), disable=False):
@@ -19,9 +19,10 @@ def live_market_price(arb_df):
             try:
                 if (index + 1) % 5 == 0:
                     btc_usdt_price, eth_usdt_price = quote_live_market_price()
-                min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(market,
-                                                                                                                     btc_usdt_price,
-                                                                                                                     eth_usdt_price)
+                min_variable_name, min_variable_value, max_variable_name, max_variable_value = live_market_price_ext(
+                    market,
+                    btc_usdt_price,
+                    eth_usdt_price)
                 min_price, max_price = min_variable_value, max_variable_value
                 if min_variable_name == 'eth':
                     min_price = str(min_variable_value / eth_usdt_price)
@@ -34,7 +35,7 @@ def live_market_price(arb_df):
                 live_data_dict = {
                     'ticker': market,
                     'min_max': f"{min_variable_name}({min_price})->{max_variable_name}({max_price})",  # usdt -> btc
-                    'diffr($10_fee_included)': ((max_variable_value - min_variable_value) * (
+                    'diffr(fee_included)': ((max_variable_value - min_variable_value) * (
                             max_usdt_price / min_variable_value) - assumed_usdt_fee)
                     # profit on $10 trade with 0.04 fee (assumed)
                 }
@@ -44,10 +45,10 @@ def live_market_price(arb_df):
             live_data_tmp.dropna(axis=1, how='all', inplace=True)
             live_prices_df = pd.concat([live_prices_df, live_data_tmp], ignore_index=True)
         # return only diffr >= $0.2 (2% of 10)
-        live_prices_df = live_prices_df[live_prices_df['diffr($10_fee_included)'] >= exclude_price_diffr]
-        live_prices_df = live_prices_df.sort_values(by='diffr($10_fee_included)', ascending=False).copy()
+        live_prices_df = live_prices_df[live_prices_df['diffr(fee_included)'] >= exclude_price_diffr]
+        live_prices_df = live_prices_df.sort_values(by='diffr(fee_included)', ascending=False).copy()
         if len(live_prices_df) > 0:
-            print(f"\n Total Fetched: {len(live_prices_df)} Markets")
+            print(f"\n max_usdt_price: {max_usdt_price} \n Total Fetched: {len(live_prices_df)} Markets")
         else:
             print(f"\n No Arbitrage Founded")
         return live_prices_df

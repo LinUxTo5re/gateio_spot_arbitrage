@@ -16,11 +16,11 @@ folder_name = "JSON"
 file_name = "arb_df_bak.json"
 file_path = os.path.join(os.getcwd(), folder_name, file_name)
 sleep_timer = 1800
-max_usdt_price = 10.00  # filter coins less than max_usdt_price
+max_usdt_price = 100.00  # filter coins less than max_usdt_price
 trade_amount = 10.00  # every trade will be of worth of trade_amount
 exclude_price_diffr = 0.2
 exclude_price_diffr_pct = 2
-assumed_usdt_fee = 0.04  # fee on one complete Transaction (buy and sell == one Transaction)
+assumed_usdt_fee = 0.4  # fee on one complete Transaction (buy and sell == one Transaction)
 
 '''
 SPOT ORDERS
