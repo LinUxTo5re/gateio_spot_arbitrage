@@ -71,7 +71,7 @@ def while_loop(timer=20, passed_markets=False):  # timer == sleep_time
                 sleep_timer_half = sleep_timer_half / 2
                 print(f"\n [while_loop] sleeping for {sleep_timer_half} seconds............")
                 time.sleep(sleep_timer_half)
-        except Exception:
+        except Exception as e:
             clear_terminal()  # clear terminal
 
 

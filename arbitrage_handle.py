@@ -2,7 +2,7 @@ import pandas as pd
 import live_market
 import spot_market
 from tqdm import tqdm
-from shared import exclude_price_diffr_pct, quote_list
+from shared import exclude_price_diffr_pct, quote_list, max_usdt_price
 
 # global variables
 btc_price_diff_pct = eth_price_diff_pct = 0
@@ -43,6 +43,8 @@ def create_quote_df(spot_quote_market):
                 last_price = next((entry.get('last', None) for entry in spot_ticker_info if
                                    quote_ticker in entry.get('currency_pair', '')), None)
                 if last_price:
+                    if float(last_price) > max_usdt_price:
+                        break
                     if quote == '_USDT':
                         spot_USDT_ticker.append(ticker)
                         spot_USDT_last.append(float(last_price))
