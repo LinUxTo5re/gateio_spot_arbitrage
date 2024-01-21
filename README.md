@@ -31,5 +31,9 @@ git clone https://github.com/LinUxTo5re/gateio_spot_arbitrage.git
 cd your-project-dir
 pip install -r requirements.txt
 python3 gateio_main.py
-
+```
 ### Open help.me for more information regarding script run
+## Screenshot
+![Screenshot_20240121-153133](https://github.com/LinUxTo5re/gateio_spot_arbitrage/assets/90641894/b90f1c76-da5a-425a-8258-481b5bcdd6b4)
+![Screenshot_20240121-153100](https://github.com/LinUxTo5re/gateio_spot_arbitrage/assets/90641894/a53ad93a-297d-48cf-b661-b3a763fa8200)
+
