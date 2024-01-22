@@ -62,7 +62,7 @@ def live_market_price(arb_df):
                 actual_trade_amt.append(get_total_bid_ask_on_diff(market))
             live_prices_df['min(ask,bid)'] = actual_trade_amt
             columns = ['ticker', 'min_max', 'diffr(fee_included)', 'min(ask,bid)']
-            print(f'\n {live_prices_df[columns]}')
+            print(f'\n {live_prices_df[columns].to_string(index=False)}')
         else:
             print(f"\n No Arbitrage Founded")
         return live_prices_df
