@@ -6,10 +6,10 @@ import spot_market
 import arbitrage_handle
 import live_market
 from multiprocessing import Process
-from shared import file_path, sleep_timer, file_name
+from shared import file_path, sleep_timer, file_name, max_usdt_price
 import os
 import signal
-from extra_operations import wake_up_bro, clear_terminal, signal_handler
+from extra_operations import wake_up_bro, clear_terminal, signal_handler, get_total_bid_ask_on_diff
 
 # global variables
 updated_arb_df = ""
@@ -62,7 +62,7 @@ def while_loop(timer=20, passed_markets=False):  # timer == sleep_time
                     arb_df = updated_arb_df
                     updated_arb_df = ""
                 print(f"\n Fetching {len(arb_df)} Live Market Started .......")
-                print("\n", live_market.live_market_price(arb_df).to_string(index=False))
+                live_market.live_market_price(arb_df).to_string(index=False)
                 while_new_datetime = wake_up_bro(timer)
                 print(
                     f"\n [while_loop] will wake up at: {while_new_datetime[0]}:{while_new_datetime[1]}:{while_new_datetime[2]}")

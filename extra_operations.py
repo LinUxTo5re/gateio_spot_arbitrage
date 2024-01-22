@@ -1,6 +1,7 @@
 from platform import system
 from subprocess import call
 import requests
+import spot_market
 from shared import binance_ticker_price_url
 from datetime import datetime, timedelta
 
@@ -44,3 +45,23 @@ def binance_ticker(ticker):
 def signal_handler(signum, frame):
     print("\n Exiting Application....")
     exit(0)
+
+
+#  crypto quanty/price = avl for bid/ask
+def get_total_bid_ask_on_diff(market):
+    ticker = market[1][0]
+    min_var = market[1][3]
+    max_var = market[1][4]
+    non_usdt_price = market[1][5]
+    ask_data, bid_data = spot_market.spot_order_book(ticker + '_' + min_var, True)
+    if not min_var == 'usdt':
+        buy_total_USDT = float(ask_data[1]) * float(non_usdt_price)
+    else:
+        buy_total_USDT = float(ask_data[1]) * float(ask_data[0])
+    ask_data, bid_data = spot_market.spot_order_book(ticker + '_' + max_var, True)
+    if not max_var == 'usdt':
+        sell_total_USDT = float(bid_data[1]) * float(non_usdt_price)
+    else:
+        sell_total_USDT = float(bid_data[1]) * float(bid_data[0])
+    min_pnl_last_total = min(buy_total_USDT, sell_total_USDT)
+    return min_pnl_last_total

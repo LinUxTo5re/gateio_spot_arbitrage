@@ -1,5 +1,5 @@
 import warnings
-import extra_operations
+from extra_operations import get_total_bid_ask_on_diff,binance_ticker,clear_terminal
 from spot_market import spot_ticker_information, spot_order_book
 import pandas as pd
 from shared import btc_eth_list, quote_list, assumed_usdt_fee, exclude_price_diffr, max_usdt_price
@@ -11,7 +11,7 @@ def live_market_price(arb_df):
     # Suppress FutureWarnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
     live_prices_df = pd.DataFrame(
-        columns=['ticker', 'min_max', 'diffr(fee_included)'])
+        columns=['ticker', 'min_max', 'diffr(fee_included)', 'min_var_name', 'max_var_name'])
     btc_usdt_price, eth_usdt_price = quote_live_market_price()
     try:
         for index, market in tqdm(enumerate(arb_df), desc="Live Price", total=len(arb_df), disable=False):
@@ -32,11 +32,19 @@ def live_market_price(arb_df):
                     min_price = str(min_variable_value / btc_usdt_price)
                 elif max_variable_name == 'btc':
                     max_price = str(max_variable_value / btc_usdt_price)
+                non_usdt_price = 0
+                if not min_variable_name == 'usdt':
+                    non_usdt_price = min_variable_value
+                if not max_variable_name == 'usdt':
+                    non_usdt_price = max_variable_value
                 live_data_dict = {
                     'ticker': market,
                     'min_max': f"{min_variable_name}({min_price})->{max_variable_name}({max_price})",  # usdt -> btc
                     'diffr(fee_included)': ((max_variable_value - min_variable_value) * (
-                            max_usdt_price / min_variable_value) - assumed_usdt_fee)
+                            max_usdt_price / min_variable_value) - assumed_usdt_fee),
+                    'non_usdt_price': non_usdt_price,
+                    'min_var_name': min_variable_name,
+                    'max_var_name': max_variable_name
                     # profit on $10 trade with 0.04 fee (assumed)
                 }
             except Exception as e:
@@ -49,6 +57,12 @@ def live_market_price(arb_df):
         live_prices_df = live_prices_df.sort_values(by='diffr(fee_included)', ascending=False).copy()
         if len(live_prices_df) > 0:
             print(f"\n max_usdt_price: {max_usdt_price} \n Total Fetched: {len(live_prices_df)} Markets")
+            actual_trade_amt = []
+            for market in live_prices_df.iterrows():
+                actual_trade_amt.append(get_total_bid_ask_on_diff(market))
+            live_prices_df['min(ask,bid)'] = actual_trade_amt
+            columns = ['ticker', 'min_max', 'diffr(fee_included)', 'min(ask,bid)']
+            print(f'\n {live_prices_df[columns]}')
         else:
             print(f"\n No Arbitrage Founded")
         return live_prices_df
@@ -80,7 +94,7 @@ def live_market_price_ext(market, btc_usdt_price, eth_usdt_price):
             except Exception:
                 pass
     except Exception:
-        extra_operations.clear_terminal()
+        clear_terminal()
     try:
         min_variables_value = [('usdt', usdt_live_data_min), ('eth', eth_live_data_min), ('btc', btc_live_data_min)]
         min_variables_value = list(filter(lambda x: x[1] != 0, min_variables_value))  # remove variable with zero value
@@ -120,7 +134,7 @@ def quote_live_market_price():
                     raise ValueError
         except Exception:
             if ticker == 'BTC_USDT':
-                btc_usdt_price = extra_operations.binance_ticker(ticker)
+                btc_usdt_price = binance_ticker(ticker)
             if ticker == 'ETH_USDT':
-                eth_usdt_price = extra_operations.binance_ticker(ticker)
+                eth_usdt_price = binance_ticker(ticker)
     return float(btc_usdt_price), float(eth_usdt_price)
