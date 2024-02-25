@@ -1,3 +1,5 @@
+import time
+
 import pandas as pd
 import live_market
 import spot_market
@@ -33,11 +35,18 @@ def create_quote_df(spot_quote_market):
 
     spot_markets = set(usdt_bases).intersection(set(eth_bases + btc_bases))
     spot_ticker_info = spot_market.spot_ticker_information()
+    if not isinstance(spot_ticker_info, list):
+        time.sleep(15)
+        spot_ticker_info = spot_market.spot_ticker_information()
     for i, ticker in tqdm(enumerate(spot_markets), desc="Tickers Quotation", total=len(spot_markets), colour='green',
                           disable=False):
         try:
             if (i+1) % 100 == 0:
-                spot_ticker_info = spot_market.spot_ticker_information()
+                spot_ticker_info2 = spot_market.spot_ticker_information()
+                if not spot_ticker_info2:
+                    pass
+                else:
+                    spot_ticker_info = spot_ticker_info2
             for quote in quote_list:
                 quote_ticker = ticker + quote
                 last_price = next((entry.get('last', None) for entry in spot_ticker_info if

@@ -6,7 +6,7 @@ import spot_market
 import arbitrage_handle
 import live_market
 from multiprocessing import Process
-from shared import file_path, sleep_timer, file_name, max_usdt_price
+from shared import file_path, sleep_timer, file_name, max_usdt_price, directory_path
 import os
 import signal
 from extra_operations import wake_up_bro, clear_terminal, signal_handler, get_total_bid_ask_on_diff
@@ -26,6 +26,8 @@ def arbitrage_json():
             spot_quote_market = spot_market.spot_quote_tradable_markets(spot_market_list)
             new_arb_df = arbitrage_handle.create_quote_df(spot_quote_market)
             if len(new_arb_df):
+                if not os.path.exists(directory_path):
+                    os.makedirs(directory_path)
                 new_arb_df['ticker'].to_json(file_path, orient='records')  # Overwrite existing file if exists
                 pantry_cloud.create_replace_basket(new_arb_df)
                 arbitrage_existing_json()
@@ -36,7 +38,7 @@ def arbitrage_json():
             print(f"\n [new json data] will wake up at: {new_datetime[0]}:{new_datetime[1]}:{new_datetime[2]}")
             # 1800 == 30 minutes
             time.sleep(sleep_timer)  # sleeping to avoid more api calls and data get renewed to find fresh data
-        except Exception:
+        except Exception as e:
             clear_terminal()  # clear terminal
 
 
@@ -99,5 +101,5 @@ if __name__ == '__main__':
                 process_while_loop.join()
                 process_new_json.join()
             '''
-    except Exception:
+    except Exception as e:
         clear_terminal()  # clear terminal

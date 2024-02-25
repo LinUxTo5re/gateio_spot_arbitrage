@@ -15,6 +15,7 @@ pantry_id = "4122e2b2-0c3d-44e3-87dd-5dcd191d1b38"  # No personal data has been 
 folder_name = "JSON"
 file_name = "arb_df_bak.json"
 file_path = os.path.join(os.getcwd(), folder_name, file_name)
+directory_path = os.path.join(os.getcwd(), folder_name)
 sleep_timer = 1800
 max_usdt_price = 100.00  # filter coins less than max_usdt_price
 trade_amount = 10.00  # every trade will be of worth of trade_amount
